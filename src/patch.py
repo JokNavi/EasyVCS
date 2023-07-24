@@ -4,6 +4,7 @@ from pathlib import Path
 class Version:
 
     def __init__(self, bound_file_path: Path, version: int) -> None:
+        print(bound_file_path)
         with open(bound_file_path, "rb") as file:
             content = file.read()
         self._content = content
@@ -27,7 +28,7 @@ class Version:
    
 
 if __name__ == "__main__":
-    BOUND_FILE_PATH = Path("Testing/target_file.txt")
+    BOUND_FILE_PATH = Path("Testing/test.txt")
     SAVE_DIR = BOUND_FILE_PATH.parent.joinpath("easy_vcs")
 
     VERSION_0 = Version(BOUND_FILE_PATH, 0)
