@@ -27,7 +27,7 @@ class Version:
    
 
 if __name__ == "__main__":
-    BOUND_FILE_PATH = Path("Testing/target_file.txt")
+    BOUND_FILE_PATH = Path("Testing/test.txt")
     SAVE_DIR = BOUND_FILE_PATH.parent.joinpath("easy_vcs")
 
     VERSION_0 = Version(BOUND_FILE_PATH, 0)

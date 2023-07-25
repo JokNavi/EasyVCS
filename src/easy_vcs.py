@@ -1,12 +1,49 @@
+import os
 from pathlib import Path
+from patch import Version
 
 class EasyVCS:
     def __init__(self, bound_file_path: Path, name = None) -> None:
-        self.bound_file_path = bound_file_path
-        self.save_path = bound_file_path.parent.joinpath("easy_vcs")
-        self.name = name or self.bound_file_path.stem
+        self.bound_file_path: Path = bound_file_path
+        self.name: str = name or self.bound_file_path.stem
+        self.save_dir: Path = bound_file_path.parent.joinpath("easy_vcs").joinpath(self.name)
+        self.save_dir.mkdir(parents=True, exist_ok=True)
+        self.versions = [Version(self.save_dir.joinpath(p), int(Path(p).stem)) for p in os.listdir(self.save_dir) if Path(p).suffix == ".easy_version"]
+        
+    
+    def save(self):
+        version_numbers = [number.get_version() for number in self.versions]
+        version_number = max(version_numbers) + 1 if version_numbers != [] else 0
+        version = Version(self.bound_file_path, version_number)
+        version.to_file(self.save_dir)
+        self.versions.append(version)
 
+    def _write_bytes(self, content_bytes: bytes):
+        with open(self.bound_file_path, "wb") as f:
+            f.write(content_bytes)
+
+    def load(self, version_number: int):
+        version = self.versions[version_number]
+        self._write_bytes(version.get_content())
+
+
+    def delete(self):
+        for version in self.versions:
+            version.delete(self.save_dir)
+        self.save_dir.rmdir()
+    
+        
 
 if __name__ == "__main__":
-    VERSION_0 = EasyVCS("./Testing/target_file.txt")
-    print()
+    BOUND_FILE_PATH = Path("Testing/test.txt")
+    TEST_VCS = EasyVCS(BOUND_FILE_PATH)
+    assert TEST_VCS.bound_file_path == BOUND_FILE_PATH
+    assert TEST_VCS.name == BOUND_FILE_PATH.stem
+    assert TEST_VCS.save_dir == BOUND_FILE_PATH.parent.joinpath("easy_vcs").joinpath(TEST_VCS.name)
+    
+    TEST_VCS._write_bytes(b"Version 0")
+    TEST_VCS.save()
+    TEST_VCS._write_bytes(b"Version 1")
+    TEST_VCS.save()
+    TEST_VCS.load(0)
+    TEST_VCS.delete()
