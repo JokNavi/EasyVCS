@@ -18,6 +18,15 @@ class EasyVCS:
         version.to_file(self.save_dir)
         self.versions.append(version)
 
+    def _write_bytes(self, content_bytes: bytes):
+        with open(self.bound_file_path, "wb") as f:
+            f.write(content_bytes)
+
+    def load(self, version_number: int):
+        version = self.versions[version_number]
+        self._write_bytes(version.get_content())
+
+
     def delete(self):
         for version in self.versions:
             version.delete(self.save_dir)
@@ -31,5 +40,10 @@ if __name__ == "__main__":
     assert TEST_VCS.bound_file_path == BOUND_FILE_PATH
     assert TEST_VCS.name == BOUND_FILE_PATH.stem
     assert TEST_VCS.save_dir == BOUND_FILE_PATH.parent.joinpath("easy_vcs").joinpath(TEST_VCS.name)
-
+    
+    TEST_VCS._write_bytes(b"Version 0")
+    TEST_VCS.save()
+    TEST_VCS._write_bytes(b"Version 1")
+    TEST_VCS.save()
+    TEST_VCS.load(0)
     TEST_VCS.delete()

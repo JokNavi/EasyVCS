@@ -4,7 +4,6 @@ from pathlib import Path
 class Version:
 
     def __init__(self, bound_file_path: Path, version: int) -> None:
-        print(bound_file_path)
         with open(bound_file_path, "rb") as file:
             content = file.read()
         self._content = content
