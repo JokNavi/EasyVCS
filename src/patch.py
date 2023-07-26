@@ -22,34 +22,35 @@ class Patch:
 
 
     @classmethod
-    def from_file(cls: object, path: Path):
-        if not path.suffix == ".easy_patch":
+    def from_file(cls, file_path: Path):
+        if file_path.suffix != ".easy_patch":
             raise TypeError("File is not a patch file.")
         try:
-            version = int(path.stem)
+            version = int(file_path.stem)
         except ValueError:
-            raise TypeError("Patch file doesn't contain a integer type file stem.")
-        if not path.exists():
-            raise TypeError("No file found at Path.")
-        with open(path, "wb") as f:
-            patch_data = f.read()
+            raise TypeError("Patch file doesn't contain an integer file stem.")
+        if not file_path.exists():
+            raise TypeError("No file found at the given path.")
+        with open(file_path, "rb") as file:
+            patch_data = file.read()
         return cls(patch_data, version)
 
     def apply_patch(self, old_bytes: bytes) -> bytes:
-        pass
-
-    def revert_patch(self, new_bytes: bytes) -> bytes:
-        pass
+        return bsdiff4.patch(old_bytes, self.patch_data)
 
     def to_file(self, dir: Path) -> None:
         pass
 
 
 if __name__ == "__main__":
-    # old_data = b"old data"
-    # new_data = b"new data"
+    old_data = b"old data"
+    new_data = b"new data"
 
-    # delta = bsdiff4.diff(old_data, new_data)
+    delta = bsdiff4.diff(old_data, new_data)
+    
+    old = bsdiff4.patch(None, delta)
+    print(old)
+
 
     # # Save the delta to a file
     # with open("delta.patch", "wb") as f:
