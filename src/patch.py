@@ -39,19 +39,17 @@ class Patch:
         return bsdiff4.patch(old_bytes, self.patch_data)
 
     def to_file(self, dir: Path) -> None:
-        pass
+        path: Path = dir.joinpath(f"{self.version}.easy_patch")
+        with open(path, "wb") as file:
+            file.write(self.patch_data)
 
 
 if __name__ == "__main__":
-    old_data = b"old data"
-    new_data = b"new data"
+    # old_data = b"old data"
+    # new_data = b"new data"
 
-    delta = bsdiff4.diff(old_data, new_data)
+    # delta = bsdiff4.diff(old_data, new_data)
     
-    old = bsdiff4.patch(None, delta)
-    print(old)
-
-
     # # Save the delta to a file
     # with open("delta.patch", "wb") as f:
     #     f.write(delta)
