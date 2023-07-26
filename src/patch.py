@@ -1,40 +1,52 @@
 from pathlib import Path
+import bsdiff4
+import os
+
+class TypeError(Exception):
+    """Raise if the file you're checking is not a valid PatchFile."""
+
+    def __init__(self, message="Invalid Patch file."):
+        self.message = message
+        super().__init__(self.message)
 
 
-class Version:
+class Patch:
+    def __init__(self, patch_data: bytes, version: int) -> None:
+        self.patch_data: bytes = patch_data
+        self.version: int = version
 
-    def __init__(self, bound_file_path: Path, version: int) -> None:
-        with open(bound_file_path, "rb") as file:
-            content = file.read()
-        self._content = content
-        self._version = version
-    
-    def get_content(self) -> bytes:
-        return self._content
-    
-    def get_version(self) -> int:
-        return self._version
-    
-    def to_file(self, save_dir: Path) -> None:
-        with open(self._save_path(save_dir), "wb") as file:
-            file.write(self.get_content())
+    def __eq__(self, __value: object) -> bool:
+        return self.patch_data == __value.patch_data and self.version == __value.version
 
-    def _save_path(self, save_dir: Path) -> Path:
-        return save_dir.joinpath(f"{self._version}.easy_version")
+    @classmethod
+    def new(cls, old_data: bytes, new_data: bytes, version: int) -> None:
+        patch_data = bsdiff4.diff(old_data, new_data)
+        return cls(patch_data, version)
 
-    def delete(self, save_dir: Path) -> None:
-        self._save_path(save_dir).unlink(True)
-   
+    @classmethod
+    def from_file(cls, file_path: Path):
+        if file_path.suffix != ".easy_patch":
+            raise TypeError("File is not a patch file.")
+        try:
+            version = int(file_path.stem)
+        except ValueError:
+            raise TypeError("Patch file doesn't contain an integer file stem.")
+        if not file_path.exists():
+            raise TypeError("No file found at the given path.")
+        with open(file_path, "rb") as file:
+            patch_data = file.read()
+        return cls(patch_data, version)
+
+    def apply_patch(self, old_bytes: bytes) -> bytes:
+        return bsdiff4.patch(old_bytes, self.patch_data)
+
+    def to_file(self, output_directory: Path) -> None:
+        if not os.path.exists(output_directory):
+            os.mkdir(output_directory)
+        file_path = os.path.join(output_directory, f"{self.version}.easy_patch")
+        with open(file_path, "wb") as file:
+            file.write(self.patch_data)
+
 
 if __name__ == "__main__":
-    BOUND_FILE_PATH = Path("Testing/test.txt")
-    SAVE_DIR = BOUND_FILE_PATH.parent.joinpath("easy_vcs")
-
-    VERSION_0 = Version(BOUND_FILE_PATH, 0)
-    assert VERSION_0.get_version() == 0
-    assert VERSION_0.get_content() == b"Version 1 content"
-
-    VERSION_0.to_file(SAVE_DIR)
-    assert Path("./Testing/easy_vcs/").exists()
-
-    VERSION_0.delete(SAVE_DIR)
+    pass
