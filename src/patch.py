@@ -1,6 +1,6 @@
 from pathlib import Path
 import bsdiff4
-
+import os
 
 class TypeError(Exception):
     """Raise if the file you're checking is not a valid PatchFile."""
@@ -40,9 +40,11 @@ class Patch:
     def apply_patch(self, old_bytes: bytes) -> bytes:
         return bsdiff4.patch(old_bytes, self.patch_data)
 
-    def to_file(self, dir: Path) -> None:
-        path: Path = dir.joinpath(f"{self.version}.easy_patch")
-        with open(path, "wb") as file:
+    def to_file(self, output_directory: Path) -> None:
+        if not os.path.exists(output_directory):
+            os.mkdir(output_directory)
+        file_path = os.path.join(output_directory, f"{self.version}.easy_patch")
+        with open(file_path, "wb") as file:
             file.write(self.patch_data)
 
 
