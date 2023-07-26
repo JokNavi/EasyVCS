@@ -15,11 +15,13 @@ class Patch:
         self.patch_data: bytes = patch_data
         self.version: int = version
 
+    def __eq__(self, __value: object) -> bool:
+        return self.patch_data == __value.patch_data and self.version == __value.version
+
     @classmethod
     def new(cls, old_data: bytes, new_data: bytes, version: int) -> None:
         patch_data = bsdiff4.diff(old_data, new_data)
         return cls(patch_data, version)
-
 
     @classmethod
     def from_file(cls, file_path: Path):
@@ -45,22 +47,4 @@ class Patch:
 
 
 if __name__ == "__main__":
-    # old_data = b"old data"
-    # new_data = b"new data"
-
-    # delta = bsdiff4.diff(old_data, new_data)
-    
-    # # Save the delta to a file
-    # with open("delta.patch", "wb") as f:
-    #     f.write(delta)
-
-    # old_data = b"old data"
-
-    # # Load the delta from a file
-    # with open("delta.patch", "rb") as f:
-    #     delta = f.read()
-
-    # new_data = bsdiff4.patch(old_data, delta)
-
-    # print(new_data)
     pass

@@ -36,13 +36,28 @@ class TestPatch(unittest.TestCase):
 
         DIR: Path = Path("Files")
         FILE_PATH: Path = DIR.joinpath(f"{VERSION}.easy_patch")
-        
+
         FILE_PATH.unlink(True)
         self.assertFalse(FILE_PATH.exists())
 
         PATCH.to_file(DIR)
         self.assertTrue(FILE_PATH.exists())
-       
+
+    def test_from_file(self):
+        VERSION = -2
+        OLD: bytes = b"AAA"
+        NEW: bytes =  b"AAABBB"
+
+        ORIGINAL_PATCH: Patch = Patch.new(OLD, NEW, VERSION)
+
+        DIR: Path = Path("Files")
+        FILE_PATH: Path = DIR.joinpath(f"{VERSION}.easy_patch")
+
+        FILE_PATH.unlink(True)
+        ORIGINAL_PATCH.to_file(DIR)
+
+        READ_PATCH: Patch = Patch.from_file(FILE_PATH)
+        self.assertEqual(READ_PATCH, ORIGINAL_PATCH)
         
 
 if __name__ == "__main__":
