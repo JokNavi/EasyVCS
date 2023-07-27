@@ -43,6 +43,8 @@ class TestPatch(unittest.TestCase):
         PATCH.to_file(DIR)
         self.assertTrue(FILE_PATH.exists())
 
+        FILE_PATH.unlink(True)
+
     def test_from_file(self):
         VERSION = -2
         OLD: bytes = b"AAA"
@@ -55,9 +57,13 @@ class TestPatch(unittest.TestCase):
 
         FILE_PATH.unlink(True)
         ORIGINAL_PATCH.to_file(DIR)
-
+        
         READ_PATCH: Patch = Patch.from_file(FILE_PATH)
+        
+        FILE_PATH.unlink(True)
+
         self.assertEqual(READ_PATCH, ORIGINAL_PATCH)
+        
         
 
 if __name__ == "__main__":
