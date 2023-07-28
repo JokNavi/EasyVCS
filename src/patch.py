@@ -19,7 +19,7 @@ class Patch:
         return self.patch_data == __value.patch_data and self.version == __value.version
 
     @classmethod
-    def new(cls, old_data: bytes, new_data: bytes, version: int) -> None:
+    def new(cls, old_data: bytes, new_data: bytes, version: int):
         patch_data = bsdiff4.diff(old_data, new_data)
         return cls(patch_data, version)
 
