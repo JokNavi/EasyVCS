@@ -14,19 +14,27 @@ class PatchManager:
 
     def _read_patches(self):
         return [
-            Patch.from_file(patch_path)
+            Patch.from_file(Path(os.path.join(self.patches_dir, patch_path)))
             for patch_path in os.listdir(self.patches_dir)
-            if os.path.isfile(patch_path)
+            if os.path.isfile(os.path.join(self.patches_dir, patch_path))
         ]
 
-    def loaded_version(self) -> int:
+    def current_version_number(self) -> int:
         return self.loaded_patch
 
-    def save(self, new_bytes: bytes):
+    def create_version(self, new_bytes: bytes):
         pass
 
-    def load(self, version: int):
-        pass
+    def get_version(self, version: int) -> bytes:
+        file: bytes = b""
+        i = 0
+        while i <= version:
+            file = self.patches[i].apply_patch(file)
+            i += 1
+        return file
+        
+
+
 
     def clear_patches(self):
         return [Path(os.path.join(self.patches_dir, patch_path)).unlink() for patch_path in os.listdir(self.patches_dir)]
