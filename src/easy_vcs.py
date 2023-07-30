@@ -8,20 +8,19 @@ from patch_manager import PatchManager
 class EasyVCS:
 
     def __init__(self, vcs_file_path: Path) -> None:
-        name, bound_file_path, loaded_version = self.read_easy_vcs_save(vcs_file_path.resolve())
+        name, bound_file_path = self.read_easy_vcs_save(vcs_file_path.resolve())
         self.name: str = name
         self.bound_file_path: Path = bound_file_path
-        self.loaded_version: int = loaded_version
         self.patch_manager: PatchManager = PatchManager(vcs_file_path.parent / "versions")
 
 
     @classmethod
-    def new(cls, name: str, bound_file_path: Path, loaded_version: int = 0):
+    def new(cls, name: str, bound_file_path: Path):
         vcs_dir = bound_file_path.parent.resolve() / "easy_vcs" / name.lower()
         os.makedirs(vcs_dir, exist_ok=True)
         vcs_file_path = vcs_dir / f"{name.lower()}.easy_vcs"
         with open(vcs_file_path, "w") as file:
-            file.write(f"{name.lower()}\n{str(bound_file_path.resolve())}\n{str(loaded_version)}\n")
+            file.write(f"{name.lower()}\n{str(bound_file_path.resolve())}\n")
         return cls(vcs_file_path)
 
     @staticmethod
@@ -29,8 +28,8 @@ class EasyVCS:
         if not save_path.exists():
             return None, None, None
         with open(save_path, "r") as file:
-            name, bound_file_path, loaded_version = [line.strip() for line in file.readlines()]
-            return name, Path(bound_file_path), int(loaded_version)
+            name, bound_file_path = [line.strip() for line in file.readlines()]
+            return name, Path(bound_file_path)
 
     def delete(self):
         vcs_dir = self.bound_file_path.parent.resolve() / "easy_vcs" / self.name.lower()
@@ -39,6 +38,14 @@ class EasyVCS:
         self.patch_manager.delete()
         vcs_file_path.unlink()
         vcs_dir.rmdir()
+
+    def save(self):
+        new_bytes = self.bound_file_path.read_bytes()
+        self.patch_manager.new_version(new_bytes)
+
+    def load(self, version: int):
+        new_bytes = self.patch_manager.get_version(version)
+        self.bound_file_path.write_bytes(new_bytes)
         
 
 if __name__ == "__main__":
