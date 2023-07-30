@@ -16,7 +16,7 @@ class TestPatchManager(unittest.TestCase):
 
         PATCH = Patch.new(b"AAA", b"AAABBB", 1)
         PATCH.to_file(PATCH_DIR)
-        MANAGER = PatchManager(PATCH_DIR, 0)
+        MANAGER = PatchManager(PATCH_DIR)
         
         self.assertEqual(len(MANAGER.patches), 1)
 
@@ -31,7 +31,7 @@ class TestPatchManager(unittest.TestCase):
         PATCH_1 = Patch.new(b"AAA", b"AAABBB", 1)
         PATCH_0.to_file(PATCH_DIR)
         PATCH_1.to_file(PATCH_DIR)
-        MANAGER = PatchManager(PATCH_DIR, 0)
+        MANAGER = PatchManager(PATCH_DIR)
 
         self.assertEqual(MANAGER.get_version(0), b"AAA")
         self.assertEqual(MANAGER.get_version(1), b"AAABBB")
@@ -46,7 +46,7 @@ class TestPatchManager(unittest.TestCase):
         PATCH_0 = Patch.new(b"", b"AAA", 0)
         PATCH_0.to_file(PATCH_DIR)
 
-        MANAGER = PatchManager(PATCH_DIR, 0)
+        MANAGER = PatchManager(PATCH_DIR)
         MANAGER.new_version(b"AAABBB")
         
         self.assertEqual(MANAGER.get_version(0), b"AAA")

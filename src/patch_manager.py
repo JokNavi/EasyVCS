@@ -8,11 +8,11 @@ from patch import Patch
 
 
 class PatchManager:
-    def __init__(self, dir: Path, loaded_version=0) -> None:
+    def __init__(self, dir: Path) -> None:
+        dir.mkdir(exist_ok=True)
         self.patches_dir: Path = dir
         self.patches: list[Patch] = self._read_patches()
         
-
     def _read_patches(self) -> list[Patch]:
         patches = []
         for patch_path in glob.glob(os.path.join(self.patches_dir, "*")):
@@ -35,3 +35,7 @@ class PatchManager:
         patch_files = glob.glob(os.path.join(self.patches_dir, "*"))
         for patch_file in patch_files:
             os.unlink(patch_file)
+
+    def delete(self):
+        self.clear_patches()
+        self.patches_dir.rmdir()
