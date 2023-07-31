@@ -28,8 +28,10 @@ class TestPatch(unittest.TestCase):
 
         TEST_VCS.load(0)
         self.assertEqual(BOUND_FILE_PATH.read_bytes(), b"Version 0")
+
         TEST_VCS.load(1)
         self.assertEqual(BOUND_FILE_PATH.read_bytes(), b"Version 1")
+        
         TEST_VCS.load(2)
         self.assertEqual(BOUND_FILE_PATH.read_bytes(), b"Version 1")
         
